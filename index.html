@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+        Kuryr - Project Update
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="slides.css"></link>
+  </head>
+  <body>
+    <textarea id="source">
+
+layout: true
+name: title_layout
+class: title_slide
+
+---
+
+layout: true
+name: section_layout
+class: section_slide
+
+---
+
+layout: true
+name: agenda_layout
+class: content_slide agenda_slide
+
+---
+
+layout: true
+name: thank_you
+class: thank_you
+
+---
+
+layout: true
+name: content_layout
+class: content_slide
+
+---
+
+template: title_layout
+
+# Kuryr
+
+## Project Update
+
+Daniel Mellado - Senior Software Engineer - Red Hat<br />
+Michał Dulko - Software Engineer - Red Hat<br />
+<br>
+OpenStack Summit Berlin, 13.11.2018<br />
+
+---
+
+template: agenda_layout
+
+# Agenda
+
+1. What's Kuryr?
+2. Kuryr projects update
+3. Kuryr-Kubernetes update
+
+Slides available at: **https://dulek.github.io/kuryr-rocky-update**
+
+---
+
+template: section_layout
+
+What's Kuryr?
+
+---
+# Kuryr-Kubernetes
+
+## Logos or mascots
+
+
+#.left-column[![Insert graphic here](assets/kuryr-logo.png)]
+
+--
+
+#.right-column[.center[.half[![Insert graphic here](assets/kuryr-logo2.png)]]]
+
+---
+
+# Kuryr-Kubernetes
+
+## Primer
+
+* Kuryr-Kubernetes is part of OpenStack Kuryr project.
+--
+
+* Repo: https://git.openstack.org/openstack/kuryr-kubernetes
+* Written in Python, *kuryr-kubernetes* on Python Package Index.
+--
+
+* Developers from Red Hat, Huawei, Intel, Samsung…
+--
+
+* Out of experimental phase in **OpenStack Queens release** with version **0.4.3**.
+* Follows **cycle-with-intermediary** release model.
+
+--
+
+## Goals
+
+* Provide a Container Network Interface plugin that will use OpenStack Neutron
+  for Kubernetes Pods networking.
+* Provide kube-proxy equivalent that will use OpenStack Octavia for Kubernetes
+  Services loadbalancing and Ingress implementation.
+
+---
+
+# Kuryr-Kubernetes
+
+## How to use, how to contribute
+
+* Documentation: https://docs.openstack.org/kuryr-kubernetes/latest
+* IRC channel: [#openstack-kuryr@Freenode](irc://chat.freenode.net/openstack-kuryr)
+* Bugs: https://bugs.launchpad.net/kuryr-kubernetes
+* How to contribute: https://wiki.openstack.org/wiki/How_To_Contribute
+
+---
+
+template: section_layout
+
+![CC](assets/cc.svg)
+.medium-text[
+Slides are available on
+
+http://creativecommons.org/licenses/by/4.0/
+]
+
+---
+
+template: thank_you
+
+# Q&A
+
+## Thank you!
+
+**Slides can be found at:**
+
+- https://dulek.github.io/kuryr-kubernetization
+- https://github.com/dulek/kuryr-kubernetization
+
+**Michał Dulko**
+
+![email](assets/email.png)   [mdulko@redhat.com](mailto:mdulko@redhat.com)
+![irc](assets/irc.png)   [dulek (freenode)](irc://chat.freenode.net/dulek,isnick)
+
+**Daniel Mellado**
+
+![email](assets/email.png)   [dmellado@redhat.com](mailto:dmellado@redhat.com)
+![irc](assets/irc.png)   [dmellado (freenode)](irc://chat.freenode.net/dmellado,isnick)
+
+
+    </textarea>
+    <script src="remark.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        ratio: '16:9',
+        slideNumberFormat: '%current%   <span class="designator">Kuryr - Project Update · November 2018 · OpenStack Summit Berlin</span>',
+        countIncrementalSlides: false
+      });
+    </script>
+  </body>
+</html>
+
+<!-- vim: set ft=markdown : -->
