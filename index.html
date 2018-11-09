@@ -58,8 +58,7 @@ template: agenda_layout
 # Agenda
 
 1. What's Kuryr?
-2. Kuryr projects update
-3. Kuryr-Kubernetes update
+2. Kuryr-Kubernetes update
 
 Slides available at: **https://dulek.github.io/kuryr-rocky-update**
 
@@ -83,31 +82,66 @@ What's Kuryr?
 
 ---
 
-# Kuryr-Kubernetes
+# Kuryr
 
-## Primer
+## Deliverables
 
-* Kuryr-Kubernetes is part of OpenStack Kuryr project.
---
+### In active development:
 
-* Repo: https://git.openstack.org/openstack/kuryr-kubernetes
-* Written in Python, *kuryr-kubernetes* on Python Package Index.
---
-
-* Developers from Red Hat, Huawei, Intel, Samsung…
---
-
-* Out of experimental phase in **OpenStack Queens release** with version **0.4.3**.
-* Follows **cycle-with-intermediary** release model.
+* *kuryr-kubernetes*
+  * CNI plugin using Neutron to provide networking for K8s Pods.
+  * Controller providing K8s Services using Octavia or Neutron LBaaS v2.
+* *kuryr-tempest-plugin* - tests for kuryr-kubernetes
 
 --
 
-## Goals
+### Maintained:
 
-* Provide a Container Network Interface plugin that will use OpenStack Neutron
-  for Kubernetes Pods networking.
-* Provide kube-proxy equivalent that will use OpenStack Octavia for Kubernetes
-  Services loadbalancing and Ingress implementation.
+* *kuryr* - docker network plugin
+* *kuryr-libnetwork* - docker libnetwork plugin
+
+--
+
+### Retired (in Stein):
+
+* *fuxi*
+* *fuxi-kubernetes*
+* *fuxi-golang*
+
+---
+
+template: section_layout
+
+Kuryr-Kubernetes update
+
+---
+
+# Kuryr-Kuberentes update
+
+## Deprecations
+
+* Running without kuryr-daemon is now deprecated.
+  * Most likely to be removed in Stein.
+--
+
+* LBaaS v2 support is now deprecated
+  * Less likely to be removed in Stein, but still possible.
+
+--
+
+## Upgrade
+
+* For *LoadBalancer* service type: `external_svc_net` config option was added
+  in `[neutron_defaults]` section.  `external_svc_subnet` is no longer
+  required to be set.
+
+```ini
+[neutron_defaults]
+external_svc_net=<id of external network>
+# 'external_svc_subnet' field is optional, set this field in case
+# multiple subnets are attached to 'external_svc_net'
+external_svc_subnet=<id of external subnet>
+```
 
 ---
 
@@ -141,8 +175,8 @@ template: thank_you
 
 **Slides can be found at:**
 
-- https://dulek.github.io/kuryr-kubernetization
-- https://github.com/dulek/kuryr-kubernetization
+- https://dulek.github.io/kuryr-rocky-update
+- https://github.com/dulek/kuryr-rocky-update
 
 **Michał Dulko**
 
