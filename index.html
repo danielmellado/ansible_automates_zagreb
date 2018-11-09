@@ -145,6 +145,40 @@ external_svc_subnet=<id of external subnet>
 
 ---
 
+# Kuryr-Kubernetes update
+
+## Kubernetes/OpenShift releases compatiblity
+
+TODO
+
+---
+
+# Kuryr-Kubernetes update
+
+## Active/Passive HA for kuryr-controller
+
+* Works only when Kuryr-Kubernetes runs on Kubernetes/OpenShift in Pods.
+* Uses Kubernetes native way of doing leader election.
+  * Annotation on an Endpoint.
+  * Requires running side car election containers.
+
+```yaml
+- image: gcr.io/google_containers/leader-elector:0.5
+  name: leader-elector
+  args:
+  - "--election=kuryr-controller"
+  - "--http=0.0.0.0:16401"
+  - "--election-namespace=kube-system"
+  - "--ttl=5s"
+  ports:
+  - containerPort: 16401
+    protocol: TCP
+```
+
+* More info in Kuryr-Kubernetes documentation.
+
+---
+
 # Kuryr-Kubernetes
 
 ## How to use, how to contribute
