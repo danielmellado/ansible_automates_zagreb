@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>
-        Kuryr - Project Update
+        Kuryr - Onboarding
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="slides.css"></link>
@@ -44,7 +44,7 @@ template: title_layout
 
 # Kuryr
 
-## Project Update
+## Project Onboarding
 
 Daniel Mellado - Senior Software Engineer - Red Hat<br />
 Michał Dulko - Software Engineer - Red Hat<br />
@@ -58,9 +58,10 @@ template: agenda_layout
 # Agenda
 
 1. What's Kuryr?
-2. Kuryr-Kubernetes update
+2. How to contribute
+3. Demo Time!
 
-Slides available at: **https://dulek.github.io/kuryr-rocky-update**
+Slides available at: **https://dulek.github.io/kuryr-onboarding**
 
 ---
 
@@ -84,9 +85,18 @@ What's Kuryr?
 
 # Kuryr
 
-## Deliverables
+#.left-column[![Insert graphic here](assets/kuryr-logo.png)]
 
-### In active development:
+* Brings OpenStack networking to Kubernetes containers
+--
+
+* Native OpenStack infrastructure for mixed workloads
+
+---
+
+# Deliverables
+
+## In active development:
 
 * *kuryr-kubernetes*
   * CNI plugin using Neutron to provide networking for K8s Pods.
@@ -95,14 +105,14 @@ What's Kuryr?
 
 --
 
-### Maintained:
+## Maintained:
 
 * *kuryr* - docker network plugin
 * *kuryr-libnetwork* - docker libnetwork plugin
 
 --
 
-### Retired (in Stein):
+## Retired (in Stein):
 
 * *fuxi*
 * *fuxi-kubernetes*
@@ -112,81 +122,166 @@ What's Kuryr?
 
 template: section_layout
 
-Kuryr-Kubernetes update
+How to contribute?
 
 ---
 
-# Kuryr-Kuberentes update
+# Kuryr-Kubernetes: Repository Organization
 
-## Deprecations
+## * https://github.com/openstack/kuryr
 
-* Running without kuryr-daemon is now deprecated.
-  * Most likely to be removed in Stein.
---
-
-* LBaaS v2 support is now deprecated
-  * Less likely to be removed in Stein, but still possible.
+* Library for common code.
+* Should probably have been called kuryr-lib :D
 
 --
 
-## Upgrade
+## * https://github.com/openstack/kuryr-libnetwork
 
-* For *LoadBalancer* service type: `external_svc_net` config option was added
-  in `[neutron_defaults]` section.  `external_svc_subnet` is no longer
-  required to be set.
+* Docker libnetwork Neutron integration.
 
-```ini
-[neutron_defaults]
-external_svc_net=<id of external network>
-# 'external_svc_subnet' field is optional, set this field in case
-# multiple subnets are attached to 'external_svc_net'
-external_svc_subnet=<id of external subnet>
-```
+--
+
+## * https://github.com/openstack/kuryr-kubernetes
+
+* Kubernetes integration. Most active project as of now.
 
 ---
 
-# Kuryr-Kubernetes update
+# How to contribute
 
-## Kubernetes/OpenShift releases compatiblity
+## Proposing features/enhancements
 
-TODO
+* Currently using launchpad but considering a move to OpenStack Storyboards
+* Divided by project:
+  * https://blueprints.launchpad.net/kuryr-kubernetes
+  * https://blueprints.launchpad.net/kuryr-libnetwork
 
----
+--
 
-# Kuryr-Kubernetes update
+## Filing bugs
 
-## Active/Passive HA for kuryr-controller
+* Also divided by projects, as blueprints.
+* Divided by project:
+  * https://bugs.launchpad.net/kuryr-kubernetes
+  * https://bugs.launchpad.net/kuryr-libnetwork
 
-* Works only when Kuryr-Kubernetes runs on Kubernetes/OpenShift in Pods.
-* Uses Kubernetes native way of doing leader election.
-  * Annotation on an Endpoint.
-  * Requires running side car election containers.
-
-```yaml
-- image: gcr.io/google_containers/leader-elector:0.5
-  name: leader-elector
-  args:
-  - "--election=kuryr-controller"
-  - "--http=0.0.0.0:16401"
-  - "--election-namespace=kube-system"
-  - "--ttl=5s"
-  ports:
-  - containerPort: 16401
-    protocol: TCP
-```
-
-* More info in Kuryr-Kubernetes documentation.
+* Let's file some now!
 
 ---
 
-# Kuryr-Kubernetes
+# How to contribute
 
-## How to use, how to contribute
+## Summary
 
 * Documentation: https://docs.openstack.org/kuryr-kubernetes/latest
 * IRC channel: [#openstack-kuryr@Freenode](irc://chat.freenode.net/openstack-kuryr)
 * Bugs: https://bugs.launchpad.net/kuryr-kubernetes
 * How to contribute: https://wiki.openstack.org/wiki/How_To_Contribute
+
+---
+
+template: section_layout
+
+How to deploy Kuryr for development: Devstack
+
+---
+
+# ![devstack](assets/devstack.png)
+
+* Devstack plugin: You can install Kuryr and its tests as devstack plugins:
+  * Kuryr-Kubernetes devstack plugin
+  * Kuryr-Tempest-Plugin devstack plugin
+--
+
+* Several deployment options can be tweaked over the *local.conf* file.
+
+```ini
+[[local|localrc]]
+enable_plugin kuryr-kubernetes \
+    https://git.openstack.org/openstack/kuryr-kubernetes
+enable_service kuryr-kubernetes
+...
+enable_plugin kuryr-tempest-plugin \
+    kuryr-tempest-plugin https://git.openstack.org/openstack/kuryr-tempest-plugin
+```
+--
+
+* Runs components through systemd.
+* Best way to try out new patches.
+---
+
+# ![devstack](assets/devstack.png)
+
+* How to get to Kuryr components?
+  * Kuryr runs as container by default on kube-system namespace
+
+```ini
+$ kubectl -n kube-system get po
+NAME                                READY   STATUS             RESTARTS   AGE
+kuryr-cni-ds-2r5vb                  1/1     Running            0          1s
+kuryr-controller-859dfcfdfc-4wnl2   1/1     Running            0          1s
+```
+--
+
+* After modifying the code, nothing happens, right?
+--
+
+  * We'll need to regenerate the container image ;)
+  * *regenerate_controller_pod.sh* does it for you!
+
+---
+
+# ![devstack](assets/devstack.png)
+
+```init
+#!/bin/bash
+
+set -o errexit
+
+KURYR_DIR=${KURYR_DIR:-/opt/stack/kuryr-kubernetes}
+KURYR_CONTROLLER_NAME=${KURYR_CONTROLLER_NAME:-kuryr-controller}
+
+function build_tagged_container {
+    docker build -t kuryr/controller -f $KURYR_DIR/controller.Dockerfile $KURYR_DIR
+}
+
+function recreate_controller {
+    kubectl delete pods -n kube-system -l name=$KURYR_CONTROLLER_NAME
+}
+
+build_tagged_container
+recreate_controller
+```
+---
+
+# ![devstack](assets/devstack.png)
+
+* Getting logs
+  * You can get the logs directly from the kuryr pods
+
+```ini
+$kubectl -n kube-system logs -f kuryr-controller-859dfcfdfc-4wnl2
+2018-11-08 15:16:19.228 1 INFO kuryr_kubernetes.config [-] Logging enabled!
+2018-11-08 15:16:19.228 1 INFO kuryr_kubernetes.config [-] /usr/bin/kuryr-k8s-controller version 0.5.1
+2018-11-08 15:16:19.651 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'vif_plug_ovs.ovs.OvsPlugin'>' with name 'ovs' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
+2018-11-08 15:16:19.653 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'vif_plug_linux_bridge.linux_bridge.LinuxBridgePlugin'>' with name 'linux_bridge' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
+2018-11-08 15:16:19.653 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.NoOpPlugin'>' with name 'noop' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
+2018-11-08 15:16:19.654 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.NoOpPlugin'>' with name 'noop' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
+2018-11-08 15:16:19.654 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.SriovPlugin'>' with name 'sriov' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
+2018-11-08 15:16:19.654 1 INFO os_vif [-] Loaded VIF plugins: ovs, linux_bridge, noop, noop, sriov
+2018-11-08 15:16:19.657 1 INFO kuryr_kubernetes.controller.service [-] Configured handlers: ['vif', 'lb', 'lbaasspec', 'policy']
+2018-11-08 15:16:19.680 1 INFO kuryr_kubernetes.controller.service [-] Loaded handlers: ['lb', 'policy', 'vif', 'lbaasspec']
+
+```
+
+* Healthchecks
+  * We have healthchecks in action to make sure a pod is healthy, so if it gets corrupted or you kill it it'll get respawned.
+
+---
+
+template: section_layout
+
+Demo time!
 
 ---
 
@@ -209,8 +304,7 @@ template: thank_you
 
 **Slides can be found at:**
 
-- https://dulek.github.io/kuryr-rocky-update
-- https://github.com/dulek/kuryr-rocky-update
+- https://github.com/danielmellado/kuryr-onboarding
 
 **Michał Dulko**
 

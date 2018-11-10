@@ -1,5 +1,5 @@
-==========================================================================
-Kuryr-Kubernetes - How to make a Kubernetes app from an OpenStack service?
-==========================================================================
+=====================================
+Kuryr-Kubernetes - Project Onboarding
+=====================================
 
-Slides from presentation I've gave at OpenStack Summit Berlin 2018.
+Slides from presentation at the OpenStack Summit Berlin 2018.
