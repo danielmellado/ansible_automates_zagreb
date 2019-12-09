@@ -49,10 +49,11 @@ body {
  *****************************************************************************/
 .remark-slide .title_slide {
     background-color: #A30000;
-    background-size:  195px, 100%;
+    background-size:  195px, 195px, 100%;
     background-image: url("assets/redhat_logo_reverse.svg"),
-                      url("assets/os_background.png");
-    background-position: 175px 200px, 0% 0%;
+                      url("assets/ansible.png"),
+                      url("assets/F22_alpha_wp.png.jpeg");
+    background-position: 175px 200px, 675px 160px, 0% 0%;
 }
 .remark-slide .remark-slide-content.title_slide {
     color: #FFFFFF;
@@ -330,7 +331,7 @@ table tbody tr:nth-child(even) {
 .remark-slide .thank_you {
     background-color: #A30000;
     background-size:  100% !important;
-    background-image: url("assets/os_background.png");
+    background-image: url("assets/F22_alpha_wp.png.jpeg");
     background-position: 0% 0% !important;
 }
 .remark-slide .remark-slide-content.thank_you {

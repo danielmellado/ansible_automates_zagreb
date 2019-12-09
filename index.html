@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>
-        Kuryr - Onboarding
+        Collections in Ansible 2.9+
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="slides.css"></link>
@@ -42,13 +42,11 @@ class: content_slide
 
 template: title_layout
 
-# Kuryr
-
-## Project Onboarding
+# Collections in Ansible 2.9+
 
 Daniel Mellado - Senior Software Engineer - Red Hat<br />
 <br>
-OpenStack Summit Denver, 30.04.2019<br />
+Ansible Automates Zagreb, 11.12.2019<br />
 
 ---
 
@@ -56,225 +54,179 @@ template: agenda_layout
 
 # Agenda
 
-1. What's Kuryr?
-2. How to contribute
+1. What's a Collection?
 3. Demo Time!
 
-Slides available at: **https://danielmellado.github.io/kuryr-onboarding**
+Slides available at: **https://danielmellado.github.io/ansible_automates_zagreb**
 
 ---
 
 template: section_layout
 
-What's Kuryr?
+What's a Collection?
 
 ---
-# Kuryr-Kubernetes
+# Collections
 
-## Logos or mascots
+## What's a Collection?
 
-
-#.left-column[![Insert graphic here](assets/kuryr-logo.png)]
-
---
-
-#.right-column[.center[.half[![Insert graphic here](assets/kuryr-logo2.png)]]]
-
----
-
-# Kuryr
-
-#.left-column[![Insert graphic here](assets/kuryr-logo.png)]
-
-* Brings OpenStack networking to Kubernetes containers
---
-
-* Native OpenStack infrastructure for mixed workloads
+* A new wat to distribute Ansible content
+  * An artifact format for consistent content structure
+  * Contains 1-N of roles, modules, plugins and module utilities
+  * Enables versioning of external content
+  * Enables consistent delivery independent of Ansible distributions
+  * Installable as system, user or project resources
+* Immediate use of the content found within the artifact
+* Namespacing support built into the collection
 
 ---
+# Collections
 
-# Deliverables
+## What problems do collections solve?:
 
-## In active development:
-
-* *kuryr-kubernetes*
-  * CNI plugin using Neutron to provide networking for K8s Pods.
-  * Controller providing K8s Services using Octavia or Neutron LBaaS v2.
-* *kuryr-tempest-plugin* - tests for kuryr-kubernetes
-
+* Difficult distribution of non-role content
 --
 
-## Maintained:
-
-* *kuryr* - docker network plugin
-* *kuryr-libnetwork* - docker libnetwork plugin
-
+* Plugin/role name collisions
 --
 
-## Retired (in Stein):
+* Difficult code-sharing for most plugins
+---
+# Collections
 
-* *fuxi*
-* *fuxi-kubernetes*
-* *fuxi-golang*
+## Problem 1: Content Distribution
+
+* Multiple roles with deps? Good luck.
+
+* Roles already distribute plugins- done?
+  * Requires role to be "entered" (see also ansible-wtf)
+  * Plugins are not "first-class citizens"
+  * Versioning/maintenance issues
+
+---
+# Collections
+
+## Content Distribution with Collections
+
+* Collection may contain 1-N:
+  * Roles/Modules/Plugins
+  * Playbooks (future/TBD)
+
+* Collection is the unit of distribution and versioning
+
+* Installable:
+  * globally
+  * per-user
+  * content-adjacent (ie per-project)
+
+---
+# Collections
+
+## Instaqlling collections content
+
+* Default paths (searched in this order, configurable)
+  * (current playbook)/collections
+  * ~/.ansible/collections
+  * usr/share/ansible/collections
+
+* Mazer/ansible-galaxy
+
+* Content Hub
+
+---
+# Collections
+
+## Problem 2: Name Collisions
+
+* Ansible has a global(ish) flat plugin namespace
+
+* Role1 and Role2 both distribute my_module
+  * Which one will get used? (ha!)
+  * Can I use them both in the same run? (no
+  * What if core later includes a my_module? (screwed)
+  * What if the project has in library/ ?
+  * What if the user has in ~/.ansible/?
+  * What if the system has in /usr/share/ansible ?
+  * Issue exists for roles and all modules/plugins
+
+---
+# Collections
+
+## Namespacing with Collections
+
+* Collections have a namespace and name
+  * For distribution, namespace == Galaxy user/org
+
+* Content in collections is accessed by namespace
+  * mynamespace.mycollection.my_module
+  * f5.bigip.provisioning_role
+
+* Built-in collections
+  * ansible.builtin
+  * ansible.legacy
+
+---
+# Collections
+
+## Sample Playbook
+
+```yaml
+- hosts: somehosts
+  tasks:
+  - myns.mycollection.athing:
+
+  - ansible.builtin.ping: # use only the ping packaged in core
+
+  - ansible.legacy.ping: # use core or library(etc)/ping.py
+    when: thing | myns.mycollection.filter == 42
+
+  - ping: # still works, == ansible.legacy.ping:
+```
 
 ---
 
 template: section_layout
 
-How to contribute?
+That's awfully verbose
 
 ---
+# Collections
 
-# Kuryr-Kubernetes: Repository Organization
+## Enter the collections keyword
 
-## * https://github.com/openstack/kuryr
-
-* Library for common code.
-* Should probably have been called kuryr-lib :D
-
---
-
-## * https://github.com/openstack/kuryr-libnetwork
-
-* Docker libnetwork Neutron integration.
-
---
-
-## * https://github.com/openstack/kuryr-kubernetes
-
-* Kubernetes integration. Most active project as of now.
-
----
-
-# How to contribute
-
-## Proposing features/enhancements
-
-* Currently using launchpad but considering a move to OpenStack Storyboards
-* Divided by project:
-  * https://blueprints.launchpad.net/kuryr-kubernetes
-  * https://blueprints.launchpad.net/kuryr-libnetwork
-
---
-
-## Filing bugs
-
-* Also divided by projects, as blueprints.
-* Divided by project:
-  * https://bugs.launchpad.net/kuryr-kubernetes
-  * https://bugs.launchpad.net/kuryr-libnetwork
-
-* Let's file some now!
-
----
-
-# How to contribute
-
-## Summary
-
-* Documentation: https://docs.openstack.org/kuryr-kubernetes/latest
-* IRC channel: [#openstack-kuryr@Freenode](irc://chat.freenode.net/openstack-kuryr)
-* Bugs: https://bugs.launchpad.net/kuryr-kubernetes
-* How to contribute: https://wiki.openstack.org/wiki/How_To_Contribute
-
----
-
-template: section_layout
-
-How to deploy Kuryr for development: Devstack
-
----
-
-# ![devstack](assets/devstack.png)
-
-* Devstack plugin: You can install Kuryr and its tests as devstack plugins:
-  * Kuryr-Kubernetes devstack plugin
-  * Kuryr-Tempest-Plugin devstack plugin
---
-
-* Several deployment options can be tweaked over the *local.conf* file.
-
-```ini
-[[local|localrc]]
-enable_plugin kuryr-kubernetes \
-    https://git.openstack.org/openstack/kuryr-kubernetes
-enable_service kuryr-kubernetes
-...
-enable_plugin kuryr-tempest-plugin \
-    kuryr-tempest-plugin https://git.openstack.org/openstack/kuryr-tempest-plugin
-```
---
-
-* Runs components through systemd.
-* Best way to try out new patches.
----
-
-# ![devstack](assets/devstack.png)
-
-* How to get to Kuryr components?
-  * Kuryr runs as container by default on kube-system namespace
-
-```ini
-$ kubectl -n kube-system get po
-NAME                                READY   STATUS             RESTARTS   AGE
-kuryr-cni-ds-2r5vb                  1/1     Running            0          1s
-kuryr-controller-859dfcfdfc-4wnl2   1/1     Running            0          1s
-```
---
-
-* After modifying the code, nothing happens, right?
---
-
-  * We'll need to regenerate the container image ;)
-  * *regenerate_controller_pod.sh* does it for you!
-
----
-
-# ![devstack](assets/devstack.png)
-
-```init
-#!/bin/bash
-
-set -o errexit
-
-KURYR_DIR=${KURYR_DIR:-/opt/stack/kuryr-kubernetes}
-KURYR_CONTROLLER_NAME=${KURYR_CONTROLLER_NAME:-kuryr-controller}
-
-function build_tagged_container {
-    docker build -t kuryr/controller -f $KURYR_DIR/controller.Dockerfile $KURYR_DIR
-}
-
-function recreate_controller {
-    kubectl delete pods -n kube-system -l name=$KURYR_CONTROLLER_NAME
-}
-
-build_tagged_container
-recreate_controller
-```
----
-
-# ![devstack](assets/devstack.png)
-
-* Getting logs
-  * You can get the logs directly from the kuryr pods
-
-```ini
-$kubectl -n kube-system logs -f kuryr-controller-859dfcfdfc-4wnl2
-2018-11-08 15:16:19.228 1 INFO kuryr_kubernetes.config [-] Logging enabled!
-2018-11-08 15:16:19.228 1 INFO kuryr_kubernetes.config [-] /usr/bin/kuryr-k8s-controller version 0.5.1
-2018-11-08 15:16:19.651 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'vif_plug_ovs.ovs.OvsPlugin'>' with name 'ovs' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
-2018-11-08 15:16:19.653 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'vif_plug_linux_bridge.linux_bridge.LinuxBridgePlugin'>' with name 'linux_bridge' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
-2018-11-08 15:16:19.653 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.NoOpPlugin'>' with name 'noop' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
-2018-11-08 15:16:19.654 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.NoOpPlugin'>' with name 'noop' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
-2018-11-08 15:16:19.654 1 DEBUG os_vif [-] Loaded VIF plugin class '<class 'kuryr_kubernetes.os_vif_plug_noop.SriovPlugin'>' with name 'sriov' initialize /usr/lib/python2.7/site-packages/os_vif/__init__.py:46
-2018-11-08 15:16:19.654 1 INFO os_vif [-] Loaded VIF plugins: ovs, linux_bridge, noop, noop, sriov
-2018-11-08 15:16:19.657 1 INFO kuryr_kubernetes.controller.service [-] Configured handlers: ['vif', 'lb', 'lbaasspec', 'policy']
-2018-11-08 15:16:19.680 1 INFO kuryr_kubernetes.controller.service [-] Loaded handlers: ['lb', 'policy', 'vif', 'lbaasspec']
-
+```yaml
+- hosts: somehosts
+  collections:
+  - ansible.builtin
+  - myns.mycollection
+  - otherns.othercollection
+  tasks:
+  - mymodule: # first found in the list of  collections
+  - otherns.othercollection.mymodule: # fully-qualified is fine
 ```
 
-* Healthchecks
-  * We have healthchecks in action to make sure a pod is healthy, so if it gets corrupted or you kill it it'll get respawned.
+---
+# Collections
+
+## Problem 3: Code Sharing
+
+* module_utils only works for modules
+  * unless you're "in the box"
+  * perverse incentives
+* eg, Azure/AWS want to share utility code between
+  * modules/actions/inventory/lookup plugins
+* Just use pip!
+
+---
+# Collections
+
+## Code sharing in Collections
+
+* Entire collection is a Python namespace package
+* All installed collection content is accessible
+  * even across collections!
+  * `ansible_collections` root Python namespace
+  * `ansible_collections.mynamespace.mycollection`
 
 ---
 
@@ -303,7 +255,7 @@ template: thank_you
 
 **Slides can be found at:**
 
-- https://github.com/danielmellado/kuryr-onboarding
+- https://github.com/danielmellado/ansible_automates_zagreb
 
 **Daniel Mellado**
 
@@ -316,7 +268,7 @@ template: thank_you
     <script type="text/javascript">
       var slideshow = remark.create({
         ratio: '16:9',
-        slideNumberFormat: '%current%   <span class="designator">Kuryr - Project Onboarding · April 2019 · OpenStack Summit Denver</span>',
+        slideNumberFormat: '%current%   <span class="designator">Ansible Automates Zagreb - Collections · December 2019</span>',
         countIncrementalSlides: false
       });
     </script>

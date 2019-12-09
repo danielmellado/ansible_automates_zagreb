@@ -1,5 +1,5 @@
-=====================================
-Kuryr-Kubernetes - Project Onboarding
-=====================================
+==================================================
+Ansible Automates Zagreb - Collections - Dec. 2019
+==================================================
 
-Slides from presentation at the OpenStack Summit Berlin 2018.
+Slides from presentation at Ansible Automates Zagreb 2019.
